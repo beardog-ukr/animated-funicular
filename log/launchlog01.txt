@@ -1,0 +1,73 @@
+$ ./bin/basic-clang-fuzz -artifact_prefix="./crash/" -max_len=16 
+INFO: Seed: 2956761295
+INFO: Loaded 1 modules   (6 guards): 6 [0x77cf40, 0x77cf58), 
+INFO: A corpus is not provided, starting from an empty corpus
+#2	INITED cov: 4 ft: 4 corp: 1/1b exec/s: 0 rss: 32Mb
+#3	NEW    cov: 6 ft: 6 corp: 2/17b exec/s: 0 rss: 32Mb L: 16/16 MS: 1 InsertRepeatedBytes-
+#34	REDUCE cov: 6 ft: 6 corp: 2/16b exec/s: 0 rss: 32Mb L: 15/15 MS: 2 CopyPart-EraseBytes-
+#43	REDUCE cov: 6 ft: 6 corp: 2/9b exec/s: 0 rss: 32Mb L: 8/8 MS: 1 CrossOver-
+=================================================================
+==20543==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7ffee1e96704 at pc 0x000000504cdd bp 0x7ffee1e966b0 sp 0x7ffee1e95e60
+READ of size 5 at 0x7ffee1e96704 thread T0
+    #0 0x504cdc in __asan_memcpy /home/u1user/proj/clang-b01/llvm/projects/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cc:23
+    #1 0x53d063 in int_to_color /home/u1user/proj/ft/af/./src/func2.c:39:5
+    #2 0x53cce6 in int_pair_to_str /home/u1user/proj/ft/af/./src/func2.c:48:5
+    #3 0x53d40f in Fuzz_int_pair_to_str /home/u1user/proj/ft/af/./src/fuzz2.c:22:3
+    #4 0x53d55e in LLVMFuzzerTestOneInput /home/u1user/proj/ft/af/./src/fuzz2.c:26:3
+    #5 0x4290de in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /home/u1user/proj/clang-b01/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:463
+    #6 0x42ee94 in fuzzer::Fuzzer::RunOne(unsigned char const*, unsigned long, bool, fuzzer::InputInfo*) /home/u1user/proj/clang-b01/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:392
+    #7 0x4302fb in fuzzer::Fuzzer::MutateAndTestOne() /home/u1user/proj/clang-b01/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:589
+    #8 0x430e97 in fuzzer::Fuzzer::Loop(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, fuzzer::fuzzer_allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) /home/u1user/proj/clang-b01/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:696
+    #9 0x4252cd in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /home/u1user/proj/clang-b01/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:736
+    #10 0x41c89f in main /home/u1user/proj/clang-b01/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20
+    #11 0x7fcd257b382f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #12 0x41c918 in _start (/home/u1user/proj/ft/af/bin/basic-clang-fuzz+0x41c918)
+
+Address 0x7ffee1e96704 is located in stack of thread T0 at offset 68 in frame
+    #0 0x53cd8f in int_to_color /home/u1user/proj/ft/af/./src/func2.c:10
+
+  This frame has 3 object(s):
+    [32, 38) 'green_str' (line 11)
+    [64, 68) 'red_str' (line 12) <== Memory access at offset 68 overflows this variable
+    [80, 91) 'unrecongized_str' (line 14)
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism or swapcontext
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /home/u1user/proj/clang-b01/llvm/projects/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cc:23 in __asan_memcpy
+Shadow bytes around the buggy address:
+  0x10005c3cac90: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10005c3caca0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10005c3cacb0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10005c3cacc0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10005c3cacd0: 00 00 00 00 00 00 00 00 f1 f1 f1 f1 06 f2 f2 f2
+=>0x10005c3cace0:[04]f2 00 03 f3 f3 f3 f3 00 00 00 00 00 00 00 00
+  0x10005c3cacf0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10005c3cad00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10005c3cad10: f1 f1 f1 f1 00 00 00 00 00 f3 f3 f3 f3 f3 f3 f3
+  0x10005c3cad20: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10005c3cad30: 00 00 00 00 00 00 00 00 f1 f1 f1 f1 00 f2 f2 f2
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07 
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+==20543==ABORTING
+MS: 4 ChangeBit-CopyPart-CrossOver-ChangeByte-; base unit: 77efbbcfb8e2307a079050a2aa4ca7ea2177f5d8
+0xa,0x0,0x80,0x27,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x33,0x0,0xa,0xa,0x0,
+\x0a\x00\x80'\x00\x00\x00\x00\x00\x00\x003\x00\x0a\x0a\x00
+artifact_prefix='./crash/'; Test unit written to ./crash/crash-0437e9739a23175e4041a20f6d73587f28ea6341
+Base64: CgCAJwAAAAAAAAAzAAoKAA==
+
